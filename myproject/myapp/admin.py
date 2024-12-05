@@ -1,5 +1,5 @@
 from django.contrib import admin
-from . import models
+from .models import Product, Client, Order
 
 
 @admin.action(description="Сбросить количество до 0")
@@ -7,50 +7,55 @@ def reset_quantity(modeladmin, request, queryset):
     queryset.update(amount=0)
 
 
-@admin.register(models.Product)  # admin.site.register(Author) используем декоратор для каждой медели класса
+@admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'price', 'amount']
+    list_display = ['name', 'price', 'amount', 'category', 'rating']
     ordering = ['-amount']
     search_fields = ['description']
-    search_help_text = 'Поиск по Описание продукта (description)'
+    search_help_text = 'Поиск по описанию продукта (description)'
     actions = [reset_quantity]
 
-    # fields = ['name', 'description', 'price', 'amount', 'image', 'added_at']
     readonly_fields = ['added_at']
     fieldsets = [
         (
-            None, {  # используем поле без определенного названия
-                'classes': ['wide'],  # класс ['wide'] максимально большое поле в панели
-                'fields': ['name'],  # в качестве поля name
+            None, {
+                'classes': ['wide'],
+                'fields': ['name', 'category'],
             },
         ),
         (
-            'Подробности',  # блок подробности
+            'Подробности',
             {
-                'classes': ['collapse'],  # скрытое поле
-                'description': 'Категория товара и описание',  # при развороте выдает описание
-                'fields': ['category', 'description'],  # поля которые мы спрятали
+                'classes': ['collapse'],
+                'description': 'Описание продукта',
+                'fields': ['description', 'image'],
             },
         ),
         (
             'Финансы',
             {
-                'fields': ['price', 'quantity'],
+                'fields': ['price', 'amount'],
             }
         ),
         (
             'Рейтинг',
             {
                 'description': 'Рейтинг сформирован автоматически на основе оценок покупателей',
-                'fields': ['rating', 'date_added'],
+                'fields': ['rating'],
+            }
+        ),
+        (
+            'Дата добавления',
+            {
+                'fields': ['added_at'],
             }
         ),
     ]
 
 
-@admin.register(models.Client)
+@admin.register(Client)
 class ClientAdmin(admin.ModelAdmin):
-    list_display = ['name', 'email']
+    list_display = ['name', 'email', 'phone']
     ordering = ['name']
     search_fields = ['name']
     search_help_text = 'Поиск по имени (name)'
@@ -58,13 +63,7 @@ class ClientAdmin(admin.ModelAdmin):
     readonly_fields = ['reg_date']
 
 
-@admin.register(models.Order)
+@admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['client', 'common_price']
-
+    list_display = ['client', 'common_price', 'date']
     readonly_fields = ['date']
-
-
-from django.contrib import admin
-
-# Register your models here.
