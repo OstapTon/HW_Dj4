@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.core.files.storage import FileSystemStorage
-from myapp.forms import ImageForm
+from .forms import ImageForm
 from . import models
 from . import forms
 

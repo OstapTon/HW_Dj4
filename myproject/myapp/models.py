@@ -42,6 +42,7 @@ class Product(models.Model):
 
 
 class Order(models.Model):
+    id = models.AutoField(primary_key=True)  # Явно объявляем поле id
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     products = models.ManyToManyField(Product)
     common_price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -49,3 +50,4 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order #{self.id} by {self.client.name}"
+
