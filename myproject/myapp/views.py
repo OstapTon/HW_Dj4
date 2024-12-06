@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
 from django.core.files.storage import FileSystemStorage
-from .forms import ImageForm
+from myapp.forms import ImageForm
 from . import models
 from . import forms
+from django.db.models import Sum
 
 
 def index(request):
@@ -52,3 +53,29 @@ def upload_image(request):
     else:
         form = ImageForm()
     return render(request, 'upload_image.html', {'form': form})
+
+def total_in_db(request):
+    total = models.Product.objects.aggregate(Sum('amount')) # сумма по столбцу количество aggregate - метод запроса к базе данных
+    context = {
+        'title': 'Общее количество посчитано в базеданных',
+        'total': total,
+    }
+    return render(request, 'total_count.html', context) # total_count.htm универсальный шаблон для трех представлений
+
+
+def total_in_view(request):
+    products = models.Product.objects.all()                 # помещаем абсолютно все продукты
+    total = sum(product.amount for product in products)  # перебераю каждый продкт, обращаюсь к его свойству amount и суммурую его
+    context = {
+        'title': 'Общее количество посчитано в представлении',
+        'total': total,
+    }
+    return render(request, 'total_count.html', context)
+
+
+def total_in_template(request):  # будет работать напрямую с классом продукт
+    context = {
+        'title': 'Общее количество посчитано в шаблоне',
+        'products': models.Product,
+    }
+    return render(request, 'total_count.html', context)
